@@ -5,6 +5,7 @@ import com.catchvbackend.service.SeviceRepository.dao.FaceDataDaoJDBC;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,28 +57,27 @@ public class MainServiceController {
     public void flaskApi(@RequestParam("files") List<MultipartFile> faceDatalist,
                                  @RequestParam("email") String userEmail) {
 
-        String url = "http://localhost:5001/user/"+userEmail;
+        String url = "http://localhost:5000/user/"+userEmail;
 
         RestTemplate restTemplate = new RestTemplate();
-
+        restTemplate.getMessageConverters()
+                .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        MultiValueMap<String, List<byte[]>> params = new LinkedMultiValueMap<>();
+        MultiValueMap<String, byte[]> params = new LinkedMultiValueMap<>();
 
-        ArrayList<byte[]> list = new ArrayList<>();
+
 
         for(int i=0;i<faceDatalist.size();i++) {
             try {
-                list.add(faceDatalist.get(i).getBytes());
+                params.add("files", faceDatalist.get(i).getBytes());
             }catch (IOException e){
                 e.printStackTrace();
             }
         }
 
-        params.add("files", list);
-
-        HttpEntity<MultiValueMap<String, List<byte[]>>> request = new HttpEntity<>(params, headers);
+        HttpEntity<MultiValueMap<String, byte[]>> request = new HttpEntity<>(params, headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
