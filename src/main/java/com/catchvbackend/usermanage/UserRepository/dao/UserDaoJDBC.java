@@ -1,6 +1,7 @@
 package com.catchvbackend.usermanage.UserRepository.dao;
 
 import com.catchvbackend.usermanage.UserRepository.UserMember.User;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserDaoJDBC implements UserDao {
     private static JdbcTemplate jdbcTemplate;
 
